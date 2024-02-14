@@ -1,118 +1,136 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import { SafeAreaView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View, ViewStyle } from 'react-native'
+import React from 'react'
+import { useState } from 'react'
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
-
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+export default function App() {
+  const [input, setInput] = useState('')
+  const [result, setResult] = useState('')
+  const crossFun = () =>{
+    setInput(input => {
+      return input.slice(0, -1);
+    });
   };
-
+  const onButtonPress = (value : any) =>{
+    if (value === '=') {
+      try{
+        setResult(eval(input));
+        setInput('');
+      }
+      catch(error){
+        setResult('error')
+      }
+    } else if (value === 'C') {
+      setInput('');
+      setResult('');
+    } else if(value === 'X') {
+      crossFun()
+    } else if(value === 'X' && result.length >0){
+      setResult('');
+    }
+    
+    else{
+      setInput(input + value)
+    }
+  }
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
+    <SafeAreaView style={styles.container}>
+      {/* <StatusBar  /> */}
+      <View style={styles.resultContainer}>
+        <Text style={styles.resultText}>
+          {result}
+        </Text>
+      </View>
+      <View style={styles.inputContainer}>
+        <TextInput 
+        style={styles.inputText}
+        value={input}
+        onChangeText={setInput}
+        keyboardType='numeric'
+        >
+        </TextInput>
+      </View>
+      <View style={styles.buttonContainer}>
+        {['C', '%', '/', 'X','7', '8', '9', '*', '4', '5', '6','-', '1', '2', '3', '+', '+/-', '0', '.', '='].map(
+          (item, index)=>(
+            <TouchableOpacity
+            key={index}
+            style={[styles.button,
+            (item === 'C' || item === '()' || item === '%' || item === '/' || item === '*' || item === '-' || item === '+') ? styles.lightGreyButtons : null,
+            item === '='? styles.equalButton : null,
+            ]}
+            onPress={()=> onButtonPress(item)}
+            >
+              <Text style={[styles.buttonText,
+              (item === '()'|| item === '%' || item === '/' || item === '*' || item === '-' || item === '+') ? styles.greenButton : null,
+              (item === 'C') ? styles.redButton : null,
+              ]}>{item}</Text>
+            </TouchableOpacity>
+          )
+        )}
+      </View>
     </SafeAreaView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+  container:{
+    flex:1,
+    backgroundColor:'#010101',
 
-export default App;
+  },
+  resultContainer:{
+    flex:2,
+    justifyContent:'center',
+    alignItems:'flex-end',
+  },
+  resultText:{
+    fontSize:40,
+  },
+  inputContainer:{
+    marginBottom:20,
+    borderBottomWidth:2,
+    borderColor:'#4d4d4d',
+    marginLeft:20,
+    marginRight:20,
+    flex:1,
+    justifyContent:"center",
+    alignItems:'flex-end',
+  },
+  inputText:{
+    fontSize:30,
+  },
+  buttonContainer:{
+    flexDirection:'row',
+    flexWrap:'wrap',
+    marginLeft:15,
+    marginBottom:20,
+  },
+  button:{
+    borderWidth:1,
+    margin:10,
+    backgroundColor:'#171719',
+    height:75,
+    width:75,
+    borderRadius: 75/2,
+    justifyContent:'center',
+    alignItems:'center',
+  },
+  buttonText:{
+    fontSize:35,
+
+  },
+  redButton:{
+    fontSize:35,
+    color:'#fc6969',
+  },
+  greenButton:{
+    fontSize:45,
+    color:'#6bba42',
+  },
+  lightGreyButtons:{
+    backgroundColor:'#2d2d2f'
+  },
+  equalButton:{
+    backgroundColor:'#338507'
+  }
+})
